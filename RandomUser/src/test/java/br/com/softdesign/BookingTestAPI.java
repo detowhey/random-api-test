@@ -16,14 +16,29 @@ import static org.junit.Assert.assertTrue;
 
 public class BookingTestAPI {
 
+    final String JSON_REQUEST = "{" +
+            "    \"firstname\" : \"Henrique\",\n" +
+            "    \"lastname\" : \"Almeida\",\n" +
+            "    \"totalprice\" : 80,\n" +
+            "    \"depositpaid\" : false,\n" +
+            "    \"bookingdates\" : {\n" +
+            "        \"checkin\" : \"2020-07-07\",\n" +
+            "        \"checkout\" : \"2020-10-10\"\n" +
+            "    }," +
+            "    \"additionalneeds\" : \"Lunch\"" +
+            "}";
+
+
     @BeforeClass
     public static void adicionarParametroPadrao() {
+
         RestAssured.baseURI = "https://restful-booker.herokuapp.com/";
         RestAssured.basePath = "booking/";
     }
 
     @Test
     public void listarReservas() {
+
         Response resposta = given()
                 .when().get()
                 .then().log().body()
@@ -37,19 +52,8 @@ public class BookingTestAPI {
 
     @Test
     public void criarReserva() {
-        String jsonRequest = "{" +
-                "    \"firstname\" : \"Henrique\",\n" +
-                "    \"lastname\" : \"Almeida\",\n" +
-                "    \"totalprice\" : 80,\n" +
-                "    \"depositpaid\" : false,\n" +
-                "    \"bookingdates\" : {\n" +
-                "        \"checkin\" : \"2020-07-07\",\n" +
-                "        \"checkout\" : \"2020-10-10\"\n" +
-                "    }," +
-                "    \"additionalneeds\" : \"Lunch\"" +
-                "}";
 
-        given().log().body().contentType(ContentType.JSON).body(jsonRequest)
+        given().log().body().contentType(ContentType.JSON).body(JSON_REQUEST)
                 .when().post()
                 .then().log().body()
                 .statusCode(HttpStatus.SC_OK)
@@ -60,7 +64,18 @@ public class BookingTestAPI {
 
     @Test
     public void validarReservaCriada() {
-        
+
+        int idCriado = given().contentType(ContentType.JSON).body(JSON_REQUEST)
+                .when().post()
+                .then().log().body()
+                .statusCode(HttpStatus.SC_OK)
+                .extract().response().jsonPath().getInt("bookingid");
+
+        given().log().body().contentType(ContentType.JSON)
+                .when().get()
+                .then()
+                .statusCode(HttpStatus.SC_OK)
+                .body("find{it.bookingid == " + idCriado + "}.bookingid", equalTo(idCriado));
     }
 
     @Test
@@ -69,7 +84,8 @@ public class BookingTestAPI {
         int idValido = (int) given()
                 .when().get()
                 .then()
-                .statusCode(HttpStatus.SC_OK).extract().response().jsonPath().getList("bookingid").get(0);
+                .statusCode(HttpStatus.SC_OK)
+                .extract().response().jsonPath().getList("bookingid").get(0);
 
         given().log().all().contentType(ContentType.JSON).auth().preemptive().basic("admin", "password123")
                 .when().delete(Integer.toString(idValido))
