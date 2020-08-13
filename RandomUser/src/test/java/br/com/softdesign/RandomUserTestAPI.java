@@ -3,11 +3,16 @@ package br.com.softdesign;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
+import org.apache.http.HttpStatus;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import java.util.Map;
+
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class RandomUserTestAPI {
 
@@ -23,7 +28,7 @@ public class RandomUserTestAPI {
                 .get()
                 .then()
                 .log().body()
-                .statusCode(200)
+                .statusCode(HttpStatus.SC_OK)
                 .body("info.results", is(20))
                 .body("results", hasSize(20));
     }
@@ -34,18 +39,30 @@ public class RandomUserTestAPI {
                 .when()
                 .get()
                 .then().log().body()
-                .statusCode(200)
+                .statusCode(HttpStatus.SC_OK)
                 .body("results[0].nat", equalToIgnoringCase("br"));
     }
 
     @Test
-    public void pesquisarUmUsuarioDaPagina() {
-        given().log().params().contentType(ContentType.JSON).param("page", 3)
+    public void pesquisarUsuarioPorNacionalidade() {
+        given().log().params().contentType(ContentType.JSON).param("nat", "br,us,es,ca")
                 .when()
                 .get()
                 .then().log().body()
+                .statusCode(HttpStatus.SC_OK)
+                .body("results[0].nat", anyOf(equalToIgnoringCase("br"), equalToIgnoringCase("us"),
+                        equalToIgnoringCase("es"), equalToIgnoringCase("ca")));
+    }
+
+    @Test
+    public void pesquisarUmUsuarioDaPagina() {
+        given().log().params()
+                .contentType(ContentType.JSON).param("page", 3)
+                .when()
+                .get()
+                .then().log().body()
+                .statusCode(HttpStatus.SC_OK)
                 .rootPath("info")
-                .statusCode(200)
                 .body("page", equalTo(3))
                 .body("page", isA(Integer.class))
                 .body("results", equalTo(1));
@@ -53,12 +70,15 @@ public class RandomUserTestAPI {
 
     @Test
     public void pesquisarDoUsuarioEmailNome() {
-        Response resposta = given().log().params().contentType(ContentType.JSON)
-                .param("inc", "name,email").when().get().then().log().body().extract().response();
+        Response resposta = given().log().params().contentType(ContentType.JSON).param("inc", "name,email")
+                .when().get()
+                .then().log().body()
+                .statusCode(HttpStatus.SC_OK).extract().response();
 
-        Object obj = resposta.jsonPath().get("results[0]");
-        System.out.println(resposta.jsonPath().get("results[0]").getClass());
-        System.out.println(obj.toString());
+        Map<String, Object> objetoMap = resposta.jsonPath().getMap("results[0]");
 
+        assertTrue(objetoMap.containsKey("name"));
+        assertTrue(objetoMap.containsKey("email"));
+        assertFalse(objetoMap.containsKey("gender"));
     }
 }
