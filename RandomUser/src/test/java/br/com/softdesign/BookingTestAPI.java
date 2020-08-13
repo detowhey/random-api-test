@@ -16,7 +16,7 @@ import static org.junit.Assert.assertTrue;
 
 public class BookingTestAPI {
 
-    final String JSON_REQUEST = "{" +
+    private final String RESERVA_JSON = "{" +
             "    \"firstname\" : \"Henrique\",\n" +
             "    \"lastname\" : \"Almeida\",\n" +
             "    \"totalprice\" : 80,\n" +
@@ -27,7 +27,6 @@ public class BookingTestAPI {
             "    }," +
             "    \"additionalneeds\" : \"Lunch\"" +
             "}";
-
 
     @BeforeClass
     public static void adicionarParametroPadrao() {
@@ -53,7 +52,7 @@ public class BookingTestAPI {
     @Test
     public void criarReserva() {
 
-        given().log().body().contentType(ContentType.JSON).body(JSON_REQUEST)
+        given().log().body().contentType(ContentType.JSON).body(RESERVA_JSON)
                 .when().post()
                 .then().log().body()
                 .statusCode(HttpStatus.SC_OK)
@@ -65,16 +64,17 @@ public class BookingTestAPI {
     @Test
     public void validarReservaCriada() {
 
-        int idCriado = given().contentType(ContentType.JSON).body(JSON_REQUEST)
+        int idCriado = given().contentType(ContentType.JSON).body(RESERVA_JSON)
                 .when().post()
                 .then().log().body()
                 .statusCode(HttpStatus.SC_OK)
                 .extract().response().jsonPath().getInt("bookingid");
 
-        given().log().body().contentType(ContentType.JSON)
+        given().contentType(ContentType.JSON)
                 .when().get()
-                .then()
+                .then().log().body()
                 .statusCode(HttpStatus.SC_OK)
+                .body("find{it.bookingid == " + idCriado + "}", notNullValue())
                 .body("find{it.bookingid == " + idCriado + "}.bookingid", equalTo(idCriado));
     }
 

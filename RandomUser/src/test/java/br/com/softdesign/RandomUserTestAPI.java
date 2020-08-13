@@ -83,4 +83,16 @@ public class RandomUserTestAPI {
         assertTrue(objetoMap.containsKey("name"));
         assertTrue(objetoMap.containsKey("email"));
     }
+
+    @Test
+    public void pesquisarDoUsuarioEmailNomeKey() {
+
+        given().log().params().contentType(ContentType.JSON).param("inc", "name,email")
+                .when().get()
+                .then().log().body()
+                .statusCode(HttpStatus.SC_OK)
+                .body("results[0]", not(hasKey("gender")))
+                .body("results[0]", hasKey("name"))
+                .body("results[0]", hasKey("email"));
+    }
 }
