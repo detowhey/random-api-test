@@ -18,11 +18,13 @@ public class RandomUserTestAPI {
 
     @BeforeClass
     public static void configurarValorPadrao() {
-        RestAssured.baseURI = "https://randomuser.me/api/";
+        RestAssured.baseURI = "https://randomuser.me/";
+        RestAssured.basePath = "api/";
     }
 
     @Test
     public void pesquisarListaDeUsuarios() {
+
         given().log().params().contentType(ContentType.JSON).param("results", 20)
                 .when().get()
                 .then()
@@ -34,6 +36,7 @@ public class RandomUserTestAPI {
 
     @Test
     public void pesquisarUsuarioBrasileiro() {
+
         given().log().params().contentType(ContentType.JSON).param("nat", "br")
                 .when().get()
                 .then().log().body()
@@ -43,6 +46,7 @@ public class RandomUserTestAPI {
 
     @Test
     public void pesquisarUsuarioPorNacionalidade() {
+
         given().log().params().contentType(ContentType.JSON).param("nat", "br,us,es,ca")
                 .when().get()
                 .then().log().body()
@@ -53,6 +57,7 @@ public class RandomUserTestAPI {
 
     @Test
     public void pesquisarUmUsuarioDaPagina() {
+
         given().log().params()
                 .contentType(ContentType.JSON).param("page", 3)
                 .when().get()
@@ -66,6 +71,7 @@ public class RandomUserTestAPI {
 
     @Test
     public void pesquisarDoUsuarioEmailNome() {
+
         Response resposta = given().log().params().contentType(ContentType.JSON).param("inc", "name,email")
                 .when().get()
                 .then().log().body()
@@ -73,8 +79,8 @@ public class RandomUserTestAPI {
 
         Map<String, Object> objetoMap = resposta.jsonPath().getMap("results[0]");
 
+        assertFalse(objetoMap.containsKey("gender"));
         assertTrue(objetoMap.containsKey("name"));
         assertTrue(objetoMap.containsKey("email"));
-        assertFalse(objetoMap.containsKey("gender"));
     }
 }
