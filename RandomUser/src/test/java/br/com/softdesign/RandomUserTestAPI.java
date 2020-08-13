@@ -24,8 +24,7 @@ public class RandomUserTestAPI {
     @Test
     public void pesquisarListaDeUsuarios() {
         given().log().params().contentType(ContentType.JSON).param("results", 20)
-                .when()
-                .get()
+                .when().get()
                 .then()
                 .log().body()
                 .statusCode(HttpStatus.SC_OK)
@@ -36,8 +35,7 @@ public class RandomUserTestAPI {
     @Test
     public void pesquisarUsuarioBrasileiro() {
         given().log().params().contentType(ContentType.JSON).param("nat", "br")
-                .when()
-                .get()
+                .when().get()
                 .then().log().body()
                 .statusCode(HttpStatus.SC_OK)
                 .body("results[0].nat", equalToIgnoringCase("br"));
@@ -46,8 +44,7 @@ public class RandomUserTestAPI {
     @Test
     public void pesquisarUsuarioPorNacionalidade() {
         given().log().params().contentType(ContentType.JSON).param("nat", "br,us,es,ca")
-                .when()
-                .get()
+                .when().get()
                 .then().log().body()
                 .statusCode(HttpStatus.SC_OK)
                 .body("results[0].nat", anyOf(equalToIgnoringCase("br"), equalToIgnoringCase("us"),
@@ -58,8 +55,7 @@ public class RandomUserTestAPI {
     public void pesquisarUmUsuarioDaPagina() {
         given().log().params()
                 .contentType(ContentType.JSON).param("page", 3)
-                .when()
-                .get()
+                .when().get()
                 .then().log().body()
                 .statusCode(HttpStatus.SC_OK)
                 .rootPath("info")
