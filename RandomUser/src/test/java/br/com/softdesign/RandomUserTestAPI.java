@@ -5,6 +5,7 @@ import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import org.apache.http.HttpStatus;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.Map;
@@ -70,6 +71,7 @@ public class RandomUserTestAPI {
     }
 
     @Test
+    @Ignore
     public void pesquisarDoUsuarioEmailNome() {
 
         Response resposta = given().log().params().contentType(ContentType.JSON).param("inc", "name,email")
@@ -85,7 +87,7 @@ public class RandomUserTestAPI {
     }
 
     @Test
-    public void pesquisarDoUsuarioEmailNomeKey() {
+    public void pesquisarDoUsuarioEmailSemMap() {
 
         given().log().params().contentType(ContentType.JSON).param("inc", "name,email")
                 .when().get()
