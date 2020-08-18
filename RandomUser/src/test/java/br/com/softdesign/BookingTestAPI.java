@@ -38,12 +38,7 @@ public class BookingTestAPI {
     @Test
     public void listarReservas() {
 
-        Response resposta = given()
-                .when().get()
-                .then().log().body()
-                .statusCode(HttpStatus.SC_OK).extract().response();
-
-        Map<String, Integer> objetoMap = resposta.jsonPath().getMap("[0]");
+        Map<String, Integer> objetoMap = given().when().get().jsonPath().getMap("[0]");
 
         assertFalse(objetoMap.isEmpty());
         assertTrue(objetoMap.containsKey("bookingid"));
@@ -56,6 +51,7 @@ public class BookingTestAPI {
                 .when().post()
                 .then().log().body()
                 .statusCode(HttpStatus.SC_OK)
+                .body("$", hasKey("bookingid"))
                 .body("bookingid", notNullValue())
                 .body("bookingid", isA(Integer.class))
                 .body("booking.firstname", equalToIgnoringCase("henrique"));
@@ -65,10 +61,9 @@ public class BookingTestAPI {
     public void validarReservaCriada() {
 
         int idCriado = given().contentType(ContentType.JSON).body(RESERVA_JSON)
-                .when().post()
-                .then().log().body()
-                .statusCode(HttpStatus.SC_OK)
-                .extract().response().jsonPath().getInt("bookingid");
+                .when()
+                .post()
+                .jsonPath().getInt("bookingid");
 
         given().contentType(ContentType.JSON)
                 .when().get()
@@ -81,11 +76,7 @@ public class BookingTestAPI {
     @Test
     public void excluirReserva() {
 
-        int idValido = (int) given()
-                .when().get()
-                .then()
-                .statusCode(HttpStatus.SC_OK)
-                .extract().response().jsonPath().getList("bookingid").get(0);
+        int idValido = given().when().get().jsonPath().getInt("bookingid[0]");
 
         given().log().all().contentType(ContentType.JSON).auth().preemptive().basic("admin", "password123")
                 .when().delete(Integer.toString(idValido))
