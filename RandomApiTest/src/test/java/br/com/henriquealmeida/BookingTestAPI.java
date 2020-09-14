@@ -1,8 +1,7 @@
-package br.com.softdesign;
+package br.com.henriquealmeida;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
-import io.restassured.response.Response;
 import org.apache.http.HttpStatus;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -29,15 +28,13 @@ public class BookingTestAPI {
             "}";
 
     @BeforeClass
-    public static void adicionarParametroPadrao() {
-
+    public static void addStandardParameter() {
         RestAssured.baseURI = "https://restful-booker.herokuapp.com/";
         RestAssured.basePath = "booking/";
     }
 
     @Test
-    public void listarReservas() {
-
+    public void listBookings() {
         Map<String, Integer> objetoMap = given().when().get().jsonPath().getMap("[0]");
 
         assertFalse(objetoMap.isEmpty());
@@ -45,7 +42,7 @@ public class BookingTestAPI {
     }
 
     @Test
-    public void criarReserva() {
+    public void createBooking() {
 
         given().log().body().contentType(ContentType.JSON).body(RESERVA_JSON)
                 .when().post()
@@ -58,9 +55,9 @@ public class BookingTestAPI {
     }
 
     @Test
-    public void validarReservaCriada() {
+    public void validateCreatedBooking() {
 
-        int idCriado = given().contentType(ContentType.JSON).body(RESERVA_JSON)
+        int idCreated = given().contentType(ContentType.JSON).body(RESERVA_JSON)
                 .when()
                 .post()
                 .jsonPath().getInt("bookingid");
@@ -69,17 +66,17 @@ public class BookingTestAPI {
                 .when().get()
                 .then().log().body()
                 .statusCode(HttpStatus.SC_OK)
-                .body("find{it.bookingid == " + idCriado + "}", notNullValue())
-                .body("find{it.bookingid == " + idCriado + "}.bookingid", equalTo(idCriado));
+                .body("find{it.bookingid == " + idCreated + "}", notNullValue())
+                .body("find{it.bookingid == " + idCreated + "}.bookingid", equalTo(idCreated));
     }
 
     @Test
-    public void excluirReserva() {
+    public void deleteBooking() {
 
-        int idValido = given().when().get().jsonPath().getInt("bookingid[0]");
+        int idValid = given().when().get().jsonPath().getInt("bookingid[0]");
 
         given().log().all().contentType(ContentType.JSON).auth().preemptive().basic("admin", "password123")
-                .when().delete(Integer.toString(idValido))
+                .when().delete(Integer.toString(idValid))
                 .then().log().status()
                 .statusCode(HttpStatus.SC_CREATED)
                 .body(containsString("Created"));

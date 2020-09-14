@@ -1,33 +1,28 @@
-package br.com.softdesign;
+package br.com.henriquealmeida;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
-import io.restassured.response.Response;
 import org.apache.http.HttpStatus;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
-
-import java.util.Map;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 
 public class RandomUserTestAPI {
 
     @BeforeClass
-    public static void configurarValorPadrao() {
+    public static void addStandardParameter() {
         RestAssured.baseURI = "https://randomuser.me/";
         RestAssured.basePath = "api/";
     }
 
     @Test
-    public void pesquisarListaDeUsuarios() {
+    public void searchUserList() {
 
         given().log().params().contentType(ContentType.JSON).param("results", 20)
-                .when().get()
+                .when()
+                .get()
                 .then()
                 .log().body()
                 .statusCode(HttpStatus.SC_OK)
@@ -36,7 +31,7 @@ public class RandomUserTestAPI {
     }
 
     @Test
-    public void pesquisarUsuarioBrasileiro() {
+    public void searchBrazilianUser() {
 
         given().log().params().contentType(ContentType.JSON).param("nat", "br")
                 .when().get()
@@ -46,7 +41,7 @@ public class RandomUserTestAPI {
     }
 
     @Test
-    public void pesquisarUsuarioPorNacionalidade() {
+    public void searchUserByNationality() {
 
         given().log().params().contentType(ContentType.JSON).param("nat", "br,us,es,ca")
                 .when().get()
@@ -57,7 +52,7 @@ public class RandomUserTestAPI {
     }
 
     @Test
-    public void pesquisarUmUsuarioDaPagina() {
+    public void searchUserPage() {
 
         given().log().params()
                 .contentType(ContentType.JSON).param("page", 3)
@@ -71,23 +66,7 @@ public class RandomUserTestAPI {
     }
 
     @Test
-    @Ignore
-    public void pesquisarDoUsuarioEmailNome() {
-
-        Response resposta = given().log().params().contentType(ContentType.JSON).param("inc", "name,email")
-                .when().get()
-                .then().log().body()
-                .statusCode(HttpStatus.SC_OK).extract().response();
-
-        Map<String, Object> objetoMap = resposta.jsonPath().getMap("results[0]");
-
-        assertFalse(objetoMap.containsKey("gender"));
-        assertTrue(objetoMap.containsKey("name"));
-        assertTrue(objetoMap.containsKey("email"));
-    }
-
-    @Test
-    public void pesquisarDoUsuarioEmailSemMap() {
+    public void searchUserEmail() {
 
         given().log().params().contentType(ContentType.JSON).param("inc", "name,email")
                 .when().get()
