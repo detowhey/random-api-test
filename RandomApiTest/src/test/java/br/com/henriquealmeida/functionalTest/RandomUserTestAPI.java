@@ -1,5 +1,6 @@
-package br.com.henriquealmeida;
+package br.com.henriquealmeida.functionalTest;
 
+import br.com.henriquealmeida.service.BaseService;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import org.apache.http.HttpStatus;
@@ -13,18 +14,17 @@ public class RandomUserTestAPI {
 
     @BeforeClass
     public static void addStandardParameter() {
-        RestAssured.baseURI = "https://randomuser.me/";
-        RestAssured.basePath = "api/";
+        RestAssured.baseURI = BaseService.RANDOM_USER_SERVICE;
+        RestAssured.basePath = BaseService.RADOM_USER_PATH;
     }
 
     @Test
     public void searchUserList() {
 
-        given().log().params().contentType(ContentType.JSON).param("results", 20)
+        given().contentType(ContentType.JSON).param("results", 20)
                 .when()
                 .get()
                 .then()
-                .log().body()
                 .statusCode(HttpStatus.SC_OK)
                 .body("info.results", is(20))
                 .body("results", hasSize(20));
@@ -33,9 +33,10 @@ public class RandomUserTestAPI {
     @Test
     public void searchBrazilianUser() {
 
-        given().log().params().contentType(ContentType.JSON).param("nat", "br")
-                .when().get()
-                .then().log().body()
+        given().contentType(ContentType.JSON).param("nat", "br")
+                .when()
+                .get()
+                .then()
                 .statusCode(HttpStatus.SC_OK)
                 .body("results[0].nat", equalToIgnoringCase("br"));
     }
@@ -43,9 +44,10 @@ public class RandomUserTestAPI {
     @Test
     public void searchUserByNationality() {
 
-        given().log().params().contentType(ContentType.JSON).param("nat", "br,us,es,ca")
-                .when().get()
-                .then().log().body()
+        given().contentType(ContentType.JSON).param("nat", "br,us,es,ca")
+                .when()
+                .get()
+                .then()
                 .statusCode(HttpStatus.SC_OK)
                 .body("results[0].nat", anyOf(equalToIgnoringCase("br"), equalToIgnoringCase("us"),
                         equalToIgnoringCase("es"), equalToIgnoringCase("ca")));
@@ -54,10 +56,11 @@ public class RandomUserTestAPI {
     @Test
     public void searchUserPage() {
 
-        given().log().params()
+        given()
                 .contentType(ContentType.JSON).param("page", 3)
-                .when().get()
-                .then().log().body()
+                .when()
+                .get()
+                .then()
                 .statusCode(HttpStatus.SC_OK)
                 .rootPath("info")
                 .body("page", equalTo(3))
@@ -68,9 +71,10 @@ public class RandomUserTestAPI {
     @Test
     public void searchUserEmail() {
 
-        given().log().params().contentType(ContentType.JSON).param("inc", "name,email")
-                .when().get()
-                .then().log().body()
+        given().contentType(ContentType.JSON).param("inc", "name,email")
+                .when()
+                .get()
+                .then()
                 .statusCode(HttpStatus.SC_OK)
                 .body("results[0]", not(hasKey("gender")))
                 .body("results[0]", hasKey("name"))

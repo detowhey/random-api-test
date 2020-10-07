@@ -1,5 +1,7 @@
-package br.com.henriquealmeida;
+package br.com.henriquealmeida.functionalTest;
 
+import br.com.henriquealmeida.service.BaseService;
+import br.com.henriquealmeida.utilities.JSONUtil;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import org.apache.http.HttpStatus;
@@ -13,40 +15,32 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-public class BookingTestAPI {
-
-    private final String RESERVA_JSON = "{" +
-            "    \"firstname\" : \"Henrique\",\n" +
-            "    \"lastname\" : \"Almeida\",\n" +
-            "    \"totalprice\" : 80,\n" +
-            "    \"depositpaid\" : false,\n" +
-            "    \"bookingdates\" : {\n" +
-            "        \"checkin\" : \"2020-07-07\",\n" +
-            "        \"checkout\" : \"2020-10-10\"\n" +
-            "    }," +
-            "    \"additionalneeds\" : \"Lunch\"" +
-            "}";
+public class BookingTestAPI{
 
     @BeforeClass
     public static void addStandardParameter() {
-        RestAssured.baseURI = "https://restful-booker.herokuapp.com/";
-        RestAssured.basePath = "booking/";
+        RestAssured.baseURI = BaseService.BOOKING_URI_SERVICE;
+        RestAssured.basePath = BaseService.BOOKING_URI_PATH;
     }
+
+    private final String BOOKING_JSON = JSONUtil.bookingJSONBuilder("Henrique", "Almeida",
+            80.05, false,"2020-07-07","2020-10-10", "Lunch");
 
     @Test
     public void listBookings() {
-        Map<String, Integer> objetoMap = given().when().get().jsonPath().getMap("[0]");
+        Map<String, Integer> mapObject = given().when().get().jsonPath().getMap("[0]");
 
-        assertFalse(objetoMap.isEmpty());
-        assertTrue(objetoMap.containsKey("bookingid"));
+        assertFalse(mapObject.isEmpty());
+        assertTrue(mapObject.containsKey("bookingid"));
     }
 
     @Test
     public void createBooking() {
 
-        given().log().body().contentType(ContentType.JSON).body(RESERVA_JSON)
-                .when().post()
-                .then().log().body()
+        given().contentType(ContentType.JSON).body(BOOKING_JSON)
+                .when()
+                .post()
+                .then()
                 .statusCode(HttpStatus.SC_OK)
                 .body("$", hasKey("bookingid"))
                 .body("bookingid", notNullValue())
@@ -57,14 +51,15 @@ public class BookingTestAPI {
     @Test
     public void validateCreatedBooking() {
 
-        int idCreated = given().contentType(ContentType.JSON).body(RESERVA_JSON)
+        int idCreated = given().contentType(ContentType.JSON).body(BOOKING_JSON)
                 .when()
                 .post()
                 .jsonPath().getInt("bookingid");
 
         given().contentType(ContentType.JSON)
-                .when().get()
-                .then().log().body()
+                .when()
+                .get()
+                .then()
                 .statusCode(HttpStatus.SC_OK)
                 .body("find{it.bookingid == " + idCreated + "}", notNullValue())
                 .body("find{it.bookingid == " + idCreated + "}.bookingid", equalTo(idCreated));
@@ -75,9 +70,10 @@ public class BookingTestAPI {
 
         int idValid = given().when().get().jsonPath().getInt("bookingid[0]");
 
-        given().log().all().contentType(ContentType.JSON).auth().preemptive().basic("admin", "password123")
-                .when().delete(Integer.toString(idValid))
-                .then().log().status()
+        given().contentType(ContentType.JSON).auth().preemptive().basic("admin", "password123")
+                .when()
+                .delete(Integer.toString(idValid))
+                .then()
                 .statusCode(HttpStatus.SC_CREATED)
                 .body(containsString("Created"));
     }
