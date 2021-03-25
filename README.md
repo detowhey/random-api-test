@@ -9,5 +9,5 @@
 ### Programming languages, tools and frameworks
 
 * JDK 8 or higher
-* Apache Maven Apache Maven <a href="https://maven.apache.org/download.cgi" target="_blank">Official page</a>
+* Apache Maven <a href="https://maven.apache.org/download.cgi" target="_blank">Official page</a>
 * Rest Assured <a href="https://rest-assured.io/" target="_blank">Official page</a>
