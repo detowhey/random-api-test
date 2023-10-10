@@ -13,5 +13,5 @@
 * <img src="https://logowik.com/content/uploads/images/maven-apache3537.jpg" width="30" height="30" alt="Apache Maven logo"> [Apache Maven](https://maven.apache.org/download.cgi)
 
 ### Run tests
-- All `mvn test`
-- By class `mvn test -Dtest=”TestClassName”`
+* All `mvn test`
+* By class `mvn test -Dtest=”TestClassName”`
