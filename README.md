@@ -1,10 +1,10 @@
-# Random API Test
+# REST Assured Java template
+
  Simple test projects that were developed in the training. Using **REST Assured**.
 
 ## Used APIs for test automation
 
 * [Random User Generator](https://randomuser.me)
-* [Booker](https://restful-booker.herokuapp.com/apidoc/index.htm)
 
 ### Programming languages, tools and frameworks
 
